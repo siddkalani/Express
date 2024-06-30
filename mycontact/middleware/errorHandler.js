@@ -32,7 +32,11 @@ const errorHandler = (err , req , res, next) =>{
         break;
 
         default:
-            console.log("all good")
+            case 500:
+            res.json({
+                title:"alag",
+                message: err.message
+            })
         break;
 
     }
