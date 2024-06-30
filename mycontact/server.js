@@ -1,17 +1,18 @@
 const express = require("express")
-const router = require("./routes/contactRoutes")
 const errorHandler = require("../mycontact/middleware/errorHandler")
 const app = express()
 const dotenv = require("dotenv").config()
 const connectDb = require("../mycontact/config/dbConnection")
 
-connectDb()
+connectDb();
 app.use(express.json())
 
 const port = 6001;
-
-app.use("/api/contacts",router)
+console.log(process.env.PORT)
+app.use("/api/contacts",require("./routes/contactRoutes"))
+app.use("/api/users",require("./routes/userRoutes"))
 app.use(errorHandler)
+
 app.listen(port , (req,res)=>{
     console.log(`server is running on port ${port}`)
 })

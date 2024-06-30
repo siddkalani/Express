@@ -5,6 +5,7 @@ const Contacts = require("../models/contactMode")
 const getContacts = asyncHandler (async (req,res)=>{
     const contact = await Contacts.find()
     res.status(200).json(contact)
+    console.log(Contacts.find())
 })
 
 const getContact = asyncHandler(async(req,res)=>{
@@ -32,14 +33,29 @@ const postContacts = asyncHandler(async(req,res)=>{
     res.status(201).json(contact)
 })
 
-const deleteContacts = asyncHandler(async(req,res)=>{
-    res.status(200)
-    res.json({message:`welcome to delete request ${req.params.id}`})
-})
+const deleteContacts = asyncHandler(async (req, res) => {
+    const contact = await Contacts.findById(req.params.id);
+    if (!contact) {
+        res.status(404);
+        throw new Error("Contact Not Found");
+    }
+    await Contacts.findByIdAndDelete(req.params.id); // Correct method to delete by ID
+    res.status(200).json({ message: 'Contact deleted successfully' });
+});
 
 const updateContact = asyncHandler(async(req,res)=>{
-    res.status(200)
-    res.json({message:`welcome to update request for id ${req.params.id}`})
+    const contact = await Contacts.findById(req.params.id)
+    if(!contact){
+        res.status(400);
+        throw new Error("Contact Not Found")
+    } 
+
+    const updatedContact = await Contacts.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {new:true}
+    )
+    res.status(200).json(updatedContact)
 })
 
 module.exports = {
