@@ -2,6 +2,8 @@ const asyncHandler = require("express-async-handler") //will be with async funct
 const Users = require("../models/userModal")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const validateToken = require("../middleware/validateTokenHandler")
+
 
 const registerUsers = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
@@ -41,34 +43,50 @@ const registerUsers = asyncHandler(async (req, res) => {
 });
 
 const loginUsers = asyncHandler(async (req, res) => {
+    // Extract email and password from the request body
     const { email, password } = req.body;
+
+    // Check if email and password are provided
     if (!email || !password) {
         res.status(400);
-        throw new Error("all fields are mandatory")
+        throw new Error("All fields are mandatory");
     }
-    const user = await Users.findOne({ email })
+
+    // Find the user by email in the database
+    const user = await Users.findOne({ email });
+
+    // If the user exists and the password matches
     if (user && (await bcrypt.compare(password, user.password))) {
+        // Generate an access token
         const accesstoken = jwt.sign(
             {
                 username: user.username,
                 id: user._id,
                 email: user.email
-            }, process.env.JWT_SECRET, { expiresIn: "1m" })
-        res.status(200).json({ accesstoken })
-    } else{
-        res.status(401)
-        throw new Error("email or password is not valid")
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: "15m" }
+        );
 
+        // Send the access token in the response
+        res.status(200).json({ accesstoken });
+    } else {
+        // If the email or password is invalid
+        res.status(401);
+        throw new Error("Email or password is not valid");
     }
+});
 
+//protected route , access private
+
+const currentUsers = asyncHandler(async (req, res) => {
+    res.json(req.user)
+    console.log(req.user)
 })
-    const currentUsers = asyncHandler(async (req, res) => {
-        res.status(200).json({ message: "current user" })
-    })
 
 
-    module.exports = {
-        registerUsers,
-        loginUsers,
-        currentUsers,
-    }
+module.exports = {
+    registerUsers,
+    loginUsers,
+    currentUsers,
+}
