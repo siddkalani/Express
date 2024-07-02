@@ -37,6 +37,7 @@ const errorHandler = (err , req , res, next) =>{
                 title:"unknown",
                 message: err.message
             })
+            // console.log("all good")
         break;
 
     }
