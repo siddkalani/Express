@@ -4,6 +4,7 @@ const connectDb = require('./config/dbConnection')
 const dotenv = require("dotenv").config()
 const contactRoutes = require('./routes/contactRoutes')
 const userRoutes = require('./routes/userRoutes')
+const otpRoutes = require('./routes/otpRoutes')
 const cors = require('cors');
 
 const app = express()
@@ -16,7 +17,7 @@ const port = process.env.PORT || 3002;
 
 app.use('/api/contacts',contactRoutes)
 app.use('/api/users',userRoutes)
-
+app.use('/api/otp', otpRoutes);
 app.use(errorHandler)
 
 app.listen(port, ()=>{

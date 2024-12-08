@@ -1,30 +1,27 @@
 const asyncHandler = require('express-async-handler');
-const OtpModel = require('../models/otpModel');
-const sendOtpEmail = require('../services/emailService');
-const generateOtp = require('../utils/generateOtp');
+const { generateAndSaveOtp, validateOtp } = require('../services/otpService');
 
+// Request OTP
 const requestOtp = asyncHandler(async (req, res) => {
   const { email } = req.body;
-
   if (!email) {
     res.status(400);
     throw new Error('Email is required');
   }
 
-  // Generate an OTP
-  const otp = generateOtp();
-
-  // Save OTP to the database with an expiration time
-  await OtpModel.create({
-    email,
-    otp,
-    expiresAt: Date.now() + 10 * 60 * 1000, // Valid for 10 minutes
-  });
-
-  // Send OTP to user's email
-  await sendOtpEmail(email, otp);
-
-  res.status(200).json({ message: 'OTP sent to your email' });
+  const result = await generateAndSaveOtp(email);
+  res.status(200).json(result);
 });
 
-module.exports = { requestOtp };
+// Verify OTP
+const verifyOtp = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) {
+    res.status(400);
+    throw new Error('Email and OTP are required');
+  }
+
+  await validateOtp(email, otp,res);
+});
+
+module.exports = { requestOtp, verifyOtp };

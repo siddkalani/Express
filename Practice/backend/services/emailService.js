@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
 
 const sendOtpEmail = async (email, otp) => {
   const mailOptions = {
-    from: 'noreply@yourdomain.com',
+    from: 'creaovate@gmail.com',
     to: email,
     subject: 'Your OTP Code',
     text: `Your OTP code is ${otp}. It is valid for 10 minutes.`,
